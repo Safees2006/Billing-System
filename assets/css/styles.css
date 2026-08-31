@@ -1,0 +1,705 @@
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  /* iOS 26 Liquid Glass — Clear variant tokens */
+  --wallpaper:
+    radial-gradient(ellipse 100% 80% at 15% 8%, rgba(255, 120, 180, 0.55) 0%, transparent 55%),
+    radial-gradient(ellipse 90% 70% at 88% 15%, rgba(100, 180, 255, 0.5) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 90% at 50% 100%, rgba(140, 100, 255, 0.45) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 70% 60%, rgba(80, 220, 200, 0.25) 0%, transparent 50%),
+    linear-gradient(165deg, #0c0c1e 0%, #141428 40%, #1a1040 70%, #0a1628 100%);
+  --lg-clear: linear-gradient(
+    145deg,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.04) 42%,
+    rgba(255, 255, 255, 0.07) 100%
+  );
+  --lg-blur: blur(22px) saturate(185%) brightness(1.05);
+  --lg-border: rgba(255, 255, 255, 0.22);
+  --lg-highlight: inset 0 0.5px 0 rgba(255, 255, 255, 0.45);
+  --lg-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
+  --lg-dim: rgba(0, 0, 0, 0.12);
+  --lg-radius: 22px;
+  --lg-radius-lg: 26px;
+  --lg-radius-sm: 14px;
+  --lg-radius-pill: 999px;
+  --text-primary: rgba(255, 255, 255, 0.96);
+  --text-secondary: rgba(255, 255, 255, 0.62);
+  --ios-blue: #0a84ff;
+  --ios-red: #ff453a;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #0c0c1e;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* iPhone wallpaper layer */
+.liquid-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: var(--wallpaper);
+  pointer-events: none;
+}
+
+.liquid-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.7;
+  animation: wallpaperDrift ease-in-out infinite alternate;
+}
+
+.liquid-orb--1 {
+  width: 70vw;
+  height: 70vw;
+  top: -20%;
+  left: -15%;
+  background: radial-gradient(circle, rgba(255, 100, 160, 0.6) 0%, transparent 70%);
+  animation-duration: 16s;
+}
+
+.liquid-orb--2 {
+  width: 60vw;
+  height: 60vw;
+  top: 30%;
+  right: -20%;
+  background: radial-gradient(circle, rgba(80, 160, 255, 0.55) 0%, transparent 70%);
+  animation-duration: 20s;
+  animation-delay: -5s;
+}
+
+.liquid-orb--3 {
+  width: 55vw;
+  height: 55vw;
+  bottom: -10%;
+  left: 10%;
+  background: radial-gradient(circle, rgba(160, 100, 255, 0.5) 0%, transparent 70%);
+  animation-duration: 18s;
+  animation-delay: -8s;
+}
+
+.liquid-orb--4 {
+  width: 45vw;
+  height: 45vw;
+  top: 50%;
+  left: 35%;
+  background: radial-gradient(circle, rgba(60, 220, 200, 0.35) 0%, transparent 70%);
+  animation-duration: 22s;
+  animation-delay: -3s;
+}
+
+.liquid-orb--5 {
+  width: 35vw;
+  height: 35vw;
+  bottom: 30%;
+  right: 15%;
+  background: radial-gradient(circle, rgba(255, 180, 100, 0.3) 0%, transparent 70%);
+  animation-duration: 24s;
+  animation-delay: -10s;
+}
+
+@keyframes wallpaperDrift {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(3vw, -2vh) scale(1.08); }
+}
+
+/* Hide old bubble layer — not iOS style */
+.bubble-bg {
+  display: none;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 430px);
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding:
+    calc(12px + var(--safe-top))
+    calc(12px + var(--safe-right))
+    calc(16px + var(--safe-bottom))
+    calc(12px + var(--safe-left));
+  background: transparent;
+}
+
+/* ─── iOS 26 Liquid Glass material ─── */
+.liquid-glass,
+.panel,
+.app-header {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--lg-radius);
+  background: var(--lg-clear);
+  backdrop-filter: var(--lg-blur);
+  -webkit-backdrop-filter: var(--lg-blur);
+  border: 0.5px solid var(--lg-border);
+  box-shadow: var(--lg-shadow), var(--lg-highlight);
+}
+
+/* Lensing — refracted wallpaper behind glass */
+.liquid-glass::before,
+.panel::before,
+.app-header::before {
+  content: "";
+  position: absolute;
+  inset: -50%;
+  z-index: -2;
+  background: var(--wallpaper);
+  transform: scale(1.18);
+  filter: blur(2px) saturate(1.3);
+  animation: lensShift 16s ease-in-out infinite alternate;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Dimming layer for Clear variant legibility */
+.liquid-glass::after,
+.panel::after,
+.app-header::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 255, 255, 0.14) 0%,
+      rgba(255, 255, 255, 0.03) 38%,
+      transparent 62%
+    ),
+    var(--lg-dim);
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+
+@keyframes lensShift {
+  0% { transform: scale(1.14) translate(0, 0); }
+  100% { transform: scale(1.22) translate(-0.5%, 0.8%); }
+}
+
+.app-header {
+  color: var(--text-primary);
+  padding: 16px 18px 14px;
+  position: sticky;
+  top: calc(8px + var(--safe-top));
+  z-index: 10;
+  margin-bottom: 12px;
+  border-radius: var(--lg-radius-lg);
+}
+
+.app-header h1,
+.app-header p,
+.app-header h2 {
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.app-header h1 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.app-header h2 {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: -0.01em;
+}
+
+.app-header p {
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.panel {
+  padding: 16px;
+  color: var(--text-primary);
+  transition: box-shadow 0.3s ease;
+}
+
+.panel h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  position: relative;
+  z-index: 1;
+}
+
+.panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.panel-head h2 {
+  margin: 0;
+}
+
+.menu-tools {
+  display: flex;
+  gap: 8px;
+}
+
+/* iOS glass inputs */
+input,
+select {
+  padding: 10px 14px;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--lg-radius-sm);
+  min-height: 40px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--lg-highlight);
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+input:focus,
+select:focus {
+  border-color: rgba(10, 132, 255, 0.6);
+  background: rgba(255, 255, 255, 0.12);
+}
+
+input::placeholder {
+  color: var(--text-secondary);
+}
+
+select option {
+  background: #1c1c2e;
+  color: #fff;
+}
+
+button {
+  padding: 10px 16px;
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--lg-radius-pill);
+  min-height: 40px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: var(--lg-highlight);
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+  opacity: 0.85;
+}
+
+button.primary {
+  background: rgba(10, 132, 255, 0.75);
+  border-color: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  box-shadow: var(--lg-shadow), var(--lg-highlight), 0 4px 16px rgba(10, 132, 255, 0.3);
+}
+
+button.danger {
+  background: rgba(255, 69, 58, 0.75);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+/* iOS squircle glass app-icon style cards */
+.menu-card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border: 0.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 22%;
+  padding: 12px 8px;
+  background: var(--lg-clear);
+  backdrop-filter: var(--lg-blur);
+  -webkit-backdrop-filter: var(--lg-blur);
+  box-shadow: var(--lg-shadow), var(--lg-highlight);
+  text-align: center;
+  color: var(--text-primary);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.menu-card::before {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  z-index: -2;
+  background: var(--wallpaper);
+  transform: scale(1.2);
+  filter: blur(2px) saturate(1.2);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.menu-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background:
+    linear-gradient(155deg, rgba(255, 255, 255, 0.16) 0%, transparent 45%),
+    rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+.menu-card:active {
+  transform: scale(0.96);
+}
+
+.menu-card img {
+  width: 56px;
+  height: 56px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 6px;
+  border-radius: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.menu-card h4 {
+  margin: 6px 0 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 1;
+}
+
+.menu-card p {
+  margin: 2px 0;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+.menu-card button {
+  margin-top: 6px;
+  width: 100%;
+  min-height: 32px;
+  padding: 6px 10px;
+  font-size: 0.78rem;
+  position: relative;
+  z-index: 1;
+}
+
+.cart-items {
+  max-height: 300px;
+  overflow: auto;
+  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--lg-radius-sm);
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: var(--lg-highlight);
+  position: relative;
+  z-index: 1;
+}
+
+.cart-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.88rem;
+}
+
+.qty-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qty-controls button {
+  width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.bill-box {
+  margin-top: 12px;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.15);
+  padding-top: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 5px 0;
+  font-size: 0.9rem;
+}
+
+.bill-row.total {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.actions button {
+  width: 100%;
+}
+
+.status {
+  min-height: 20px;
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  position: relative;
+  z-index: 1;
+}
+
+.admin-panel,
+.report-panel {
+  margin-top: 12px;
+}
+
+.product-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.manage-list {
+  margin-top: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+.manage-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+  padding: 10px 0;
+  font-size: 0.85rem;
+}
+
+.report-stats {
+  display: flex;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.report-card {
+  flex: 1;
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--lg-radius-sm);
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  box-shadow: var(--lg-highlight);
+}
+
+.report-card p {
+  margin: 0 0 4px;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.report-card strong {
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sales-list {
+  margin-top: 12px;
+  border-top: 0.5px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  z-index: 1;
+}
+
+.sales-row {
+  padding: 8px 0;
+  border-bottom: 0.5px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.85rem;
+}
+
+.invoice {
+  display: none;
+}
+
+/* iPhone Pro Max and larger */
+@media (min-width: 431px) {
+  .app-shell {
+    width: min(100%, 430px);
+    border-radius: 0;
+  }
+}
+
+@media (min-width: 901px) {
+  .app-shell {
+    width: min(100%, 960px);
+    padding: 24px;
+  }
+
+  .layout {
+    grid-template-columns: 1.6fr 1fr;
+    gap: 16px;
+  }
+
+  .actions {
+    flex-direction: row;
+  }
+
+  .actions button {
+    width: auto;
+  }
+
+  .menu-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .panel-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .menu-tools {
+    flex-direction: column;
+  }
+
+  .cart-row {
+    grid-template-columns: 1fr;
+  }
+
+  .qty-controls {
+    justify-content: flex-start;
+  }
+
+  .product-form {
+    grid-template-columns: 1fr;
+  }
+
+  .manage-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .report-stats {
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liquid-orb,
+  .panel::before,
+  .app-header::before,
+  .menu-card::before {
+    animation: none;
+  }
+
+  button:active,
+  .menu-card:active {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .panel,
+  .app-header,
+  .menu-card,
+  input,
+  select,
+  button,
+  .cart-items,
+  .report-card {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: rgba(30, 30, 46, 0.92);
+  }
+}
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .invoice,
+  .invoice * {
+    visibility: visible;
+  }
+
+  .invoice {
+    display: block;
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    width: 90%;
+  }
+}
